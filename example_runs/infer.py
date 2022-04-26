@@ -17,7 +17,7 @@ from ..src.utilities.spline_utils import evaluate_from_col_mat, bspline_collocat
 # from src.utilities.spline_utils import get_level_set_from_coefficients
 
 
-def parse_arguments(args=None):
+def parse_arguments(args=[]):
     parser = argparse.ArgumentParser(prog='infer', formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description="Inference of a pretrained network on entire directory")
     # Model parameters
