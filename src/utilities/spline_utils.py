@@ -1,6 +1,46 @@
-import SEAL as SE
+# import SEAL as SE
 import numpy as np
+# np.set_printoptions(precision=4)
 import torch
+
+
+def find_index(x, t):  # TODO: Provide initial guess for speed-up?
+    """
+    Given a knot vector t, find the index mu such that t[mu] <= x < t[mu+1]
+    :param x: Parameter value
+    :param t: knot vector
+    :return:
+    """
+    if abs(x - t[-1]) <= 1.0e-14:
+        # at endpoint, return last non trivial index
+        for i in range(len(t) - 1, 0, -1):
+            if t[i] < x:
+                return i
+    for i in range(len(t) - 1):
+        if t[i] <= x < t[i + 1]:
+            return i
+
+
+def create_knots(a, b, p, n):
+    """
+    Returns a p+1 regular knot vector starting at a and ending at b with total length of n + p + 1.
+    """
+    t = np.lib.pad(np.linspace(a, b, num=n - p + 1), (p, p), mode='edge')
+    return t
+
+
+def evaluate_non_zero_basis_splines(x, mu, t, p):
+    b = 1
+    for k in range(1, p + 1):
+        # extract relevant knots
+        t1 = t[mu - k + 1: mu + 1]
+        t2 = t[mu + 1: mu + k + 1]
+        # append 0 to end of first term, and insert 0 to start of second term
+        # noinspection PyArgumentList
+        omega = np.divide((x - t1), (t2 - t1), out=np.zeros_like(t1), where=((t2 - t1) != 0))
+        b = np.append((1 - omega) * b, 0) + np.insert((omega * b), 0, 0)
+
+    return b
 
 
 def bspline_collocation_matrix(d=1, n_in=128, n_out=512):
@@ -16,15 +56,23 @@ def bspline_collocation_matrix(d=1, n_in=128, n_out=512):
     # Parameter values
     x = np.linspace(0, 1, n_out)
 
+    # Knots
+    t = create_knots(0, 1, d, n_in)
+
     # Spline space
-    knots_x = SE.create_knots(0, 1, d, n_in)
-    T = SE.SplineSpace(d, knots_x)
-    fs = T.basis
+    # knots_x = SE.create_knots(0, 1, d, n_in)
+    # T = SE.SplineSpace(d, knots_x)
+    # fs = T.basis
 
     # Create a collocation matrix
-    col_mat = [[fs[i0](x0)[0] for i0 in range(n_in)] for x0 in x]
+    # col_mat = [[fs[i0](x0)[0] for i0 in range(n_in)] for x0 in x]
+    # col_mat = np.array(col_mat)
+    # col_mat = torch.tensor(col_mat, dtype=torch.float).cuda()
+
+    col_mat = [np.concatenate([np.array((find_index(x0, t)-d)*[0]),
+                               evaluate_non_zero_basis_splines(x0, find_index(x0, t), t, d),
+                               np.array((n_in - 1 - find_index(x0, t))*[0])]) for x0 in x]
     col_mat = np.array(col_mat)
-    col_mat = torch.tensor(col_mat, dtype=torch.float).cuda()
 
     return col_mat
 
