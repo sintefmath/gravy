@@ -1,0 +1,1 @@
+This data has been extracted from the Task02_Heart dataset of the Medical Segmentation Decathalon - Generalisable 3D Semantic Segmentation dataset (www.medicaldecathlon.com) under the terms of the Creative Commons Attribution-Sharealike 4.0 International license (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0/.
