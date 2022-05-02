@@ -77,6 +77,8 @@ def parse_arguments(args=None):
     parser.add_argument('--write_model_frequency', default=1, type=int,
                         help='Number of epochs to wait before storing model weights to disk')
 
+    print(len(args))
+    print(args)
     config = parser.parse_args(args)
     config.it_counter = 0
 
