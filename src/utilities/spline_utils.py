@@ -72,7 +72,9 @@ def bspline_collocation_matrix(d=1, n_in=128, n_out=512):
     # Create a collocation matrix
     # col_mat = [[fs[i0](x0)[0] for i0 in range(n_in)] for x0 in x]
     # col_mat = np.array(col_mat)
-    col_mat = torch.tensor(col_mat, dtype=torch.float).cuda()
+    col_mat = torch.tensor(col_mat, dtype=torch.float)
+    if torch.cuda.is_available():
+        col_mat = col_mat.cuda()
 
     return col_mat
 
