@@ -1,8 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.utilities.spline_utils import get_level_set_from_coefficients
-from src.utilities.spline_utils import evaluate_from_col_mat
+from ...src.utilities.spline_utils import get_level_set_from_coefficients
+from ...src.utilities.spline_utils import evaluate_from_col_mat
 
 
 def gt_prediction_comparison_figure(imgs, coeffs, gt_lbl, epoch, loss, scheduler, col_mat, linewidths=0.5, phase='val'):
