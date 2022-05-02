@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from src.utilities.spline_utils import evaluate_from_col_mat
+from ..src.utilities.spline_utils import evaluate_from_col_mat
 
 
 def intersection_over_union(array1, array2, eps=10**(-6)):
