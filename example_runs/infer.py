@@ -11,9 +11,9 @@ import torch
 from torch.utils.data import DataLoader
 from PIL import Image
 
-from ..src.models.implicit_spline_net import VGGTrunc, UNetImplicit
-from ..src.utilities.data_loaders import ImageDataSet
-from ..src.utilities.spline_utils import evaluate_from_col_mat, bspline_collocation_matrix
+from src.models.implicit_spline_net import VGGTrunc, UNetImplicit
+from src.utilities.data_loaders import ImageDataSet
+from src.utilities.spline_utils import evaluate_from_col_mat, bspline_collocation_matrix
 # from src.utilities.spline_utils import get_level_set_from_coefficients
 
 
