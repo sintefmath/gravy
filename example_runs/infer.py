@@ -112,11 +112,13 @@ def main(config):
     else:
         implicit_spline_net = globals()[config.network](config)
 
-    implicit_spline_net.load_state_dict(torch.load(config.model_path))
-    implicit_spline_net.eval()
-
     if torch.cuda.is_available():
+        implicit_spline_net.load_state_dict(torch.load(config.model_path))
+        implicit_spline_net.eval()
         implicit_spline_net.cuda()
+    else:
+        implicit_spline_net.load_state_dict(torch.load(config.model_path, map_location=torch.device('cpu')))
+        implicit_spline_net.eval()
 
     # Prepare the dataset
     imgs_dataset = ImageDataSet(config.image_paths, 512, in_channels=config.num_input_slices)
