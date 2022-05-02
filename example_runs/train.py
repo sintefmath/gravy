@@ -24,7 +24,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchsummary import summary
 
 
-def parse_arguments(args=None):
+def parse_arguments(args=[]):
     # Parsing arguments
     parser = argparse.ArgumentParser(prog='train', formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description="Train segmentation network based on implicit representation")
@@ -285,7 +285,7 @@ def main(config):
 
 
 if __name__ == '__main__':
-    ARGS = None
+    ARGS = []
 
     config_args = parse_arguments(args=ARGS)
     main(config_args)
