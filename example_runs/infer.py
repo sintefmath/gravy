@@ -2,6 +2,7 @@ import json
 import tqdm
 import sys
 import os
+import numpy as np
 import argparse
 from pathlib import Path
 sys.path.insert(0, os.getcwd())
@@ -15,6 +16,7 @@ from src.models.implicit_spline_net import VGGTrunc, UNetImplicit
 from src.utilities.data_loaders import ImageDataSet
 from src.utilities.spline_utils import evaluate_from_col_mat, bspline_collocation_matrix
 # from src.utilities.spline_utils import get_level_set_from_coefficients
+from src.metrics.evaluation_metrics import intersection_over_union, dice_index
 
 
 def parse_arguments(args=[]):
@@ -36,9 +38,9 @@ def parse_arguments(args=[]):
     # Paths
     parser.add_argument('--output_path', type=str, default=None,
                         help='Base path to directory for the output binary masks')
-    parser.add_argument('--image_paths', nargs='+', type=str, default=None,
-                        help="Directories with input images, to be processed in order of specification")
-    parser.add_argument('--mask_path', type=str, default="masks",
+    parser.add_argument('--image_path', type=str, default=None,
+                        help="Directory with input images, to be processed in order of specification")
+    parser.add_argument('--mask_path', type=str, default=None,
                         help="Relative path for output binary masks")
 
     # Inference parameters
@@ -78,8 +80,9 @@ def parse_arguments(args=[]):
     return config
 
 
-def infer(implicit_spline_net, col_mat, imgs_loader, config):
+def infer(implicit_spline_net, col_mat, imgs_loader, config, masks_loader=None):
     img_counter = 0
+    preds = []
     for imgs in tqdm.tqdm(imgs_loader, desc='Inference', leave=True):
         if torch.cuda.is_available():
             imgs = imgs.cuda()
@@ -98,6 +101,19 @@ def infer(implicit_spline_net, col_mat, imgs_loader, config):
             fname = str(img_counter).zfill(10)
             img.save(config.output_path / f"{fname}.png")
             img_counter += 1
+            preds.append(pred)
+
+    preds = np.array(preds)/255
+
+    if masks_loader is not None:
+        masks = []
+        for mask in tqdm.tqdm(masks_loader, desc='Load masks', leave=True):
+            for j in range(mask.shape[0]):
+                masks.append(np.squeeze(mask[j].cpu().detach().numpy()))
+
+        masks = np.array(masks)
+        print("Volumetric Dice = ", dice_index(preds, masks))
+        print("Volumetric Intersection over Union = ", intersection_over_union(preds, masks))
 
 
 def main(config):
@@ -121,14 +137,26 @@ def main(config):
         implicit_spline_net.eval()
 
     # Prepare the dataset
-    imgs_dataset = ImageDataSet(config.image_paths, 512, in_channels=config.num_input_slices)
+    imgs_dataset = ImageDataSet(config.image_path, 512, in_channels=config.num_input_slices)
     imgs_loader = DataLoader(imgs_dataset, batch_size=config.batch_size, shuffle=False)
 
-    infer(implicit_spline_net, col_mat, imgs_loader, config)
+    if config.mask_path is not None:
+        masks_dataset = ImageDataSet(config.mask_path, 512, in_channels=1)
+        masks_loader = DataLoader(masks_dataset, batch_size=config.batch_size, shuffle=False)
+    else:
+        masks_loader = None
+
+    infer(implicit_spline_net, col_mat, imgs_loader, config, masks_loader=masks_loader)
 
 
 if __name__ == '__main__':
     ARGS = None
+    ARGS = ["--model_path", "/home/georgm/Dropbox/Apps/Python/Projects/gravy/example_output/saved_models/weights_chd_ct_table1-O128-d3-p1.pth",
+            "--output_path", "/home/georgm/Dropbox/Apps/Python/Projects/gravy/example_output/predictions_chd_ct1/",
+            # "--image_paths", "/content/CHD_orig/test/images/"
+            "--image_path", "/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/out_512/test/12/images_512/",
+            "--mask_path", "/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/out_512/test/12/BP_masks_512/"
+            ]
 
     config_args = parse_arguments(args=ARGS)
     main(config_args)
