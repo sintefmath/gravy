@@ -13,13 +13,13 @@ sys.path.insert(0, os.getcwd() + "/..")
 import torch
 from torch.utils.data import DataLoader
 
-from src.metrics.evaluation_metrics import mask_loss_function, mask_loss_function_iou, mask_loss_function_dice, \
+from ..src.metrics.evaluation_metrics import mask_loss_function, mask_loss_function_iou, mask_loss_function_dice, \
     mask_loss_function_acc, mask_loss_function_mse, mask_loss_function_mae
-from src.utilities.data_loaders import ProcessedDataSet
-from src.utilities.spline_utils import bspline_collocation_matrix
-from src.models.implicit_spline_net import VGGTrunc, UNetImplicit
+from ..src.utilities.data_loaders import ProcessedDataSet
+from ..src.utilities.spline_utils import bspline_collocation_matrix
+from ..src.models.implicit_spline_net import VGGTrunc, UNetImplicit
 
-from src.utilities.visualization import gt_prediction_comparison_figure
+from ..src.utilities.visualization import gt_prediction_comparison_figure
 
 from torch.utils.tensorboard import SummaryWriter
 from torchsummary import summary
