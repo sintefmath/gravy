@@ -64,15 +64,15 @@ def bspline_collocation_matrix(d=1, n_in=128, n_out=512):
     # T = SE.SplineSpace(d, knots_x)
     # fs = T.basis
 
-    # Create a collocation matrix
-    # col_mat = [[fs[i0](x0)[0] for i0 in range(n_in)] for x0 in x]
-    # col_mat = np.array(col_mat)
-    # col_mat = torch.tensor(col_mat, dtype=torch.float).cuda()
-
     col_mat = [np.concatenate([np.array((find_index(x0, t)-d)*[0]),
                                evaluate_non_zero_basis_splines(x0, find_index(x0, t), t, d),
                                np.array((n_in - 1 - find_index(x0, t))*[0])]) for x0 in x]
     col_mat = np.array(col_mat)
+
+    # Create a collocation matrix
+    # col_mat = [[fs[i0](x0)[0] for i0 in range(n_in)] for x0 in x]
+    # col_mat = np.array(col_mat)
+    col_mat = torch.tensor(col_mat, dtype=torch.float).cuda()
 
     return col_mat
 
