@@ -151,12 +151,6 @@ def main(config):
 
 if __name__ == '__main__':
     ARGS = None
-    ARGS = ["--model_path", "/home/georgm/Dropbox/Apps/Python/Projects/gravy/example_output/saved_models/weights_chd_ct_table1-O128-d3-p1.pth",
-            "--output_path", "/home/georgm/Dropbox/Apps/Python/Projects/gravy/example_output/predictions_chd_ct1/",
-            # "--image_paths", "/content/CHD_orig/test/images/"
-            "--image_path", "/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/out_512/test/12/images_512/",
-            "--mask_path", "/home/georgm/Dropbox/Data/Projects/ANALYST/CHD_orig/out_512/test/12/BP_masks_512/"
-            ]
 
     config_args = parse_arguments(args=ARGS)
     main(config_args)
