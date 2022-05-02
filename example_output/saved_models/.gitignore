@@ -1,4 +1,8 @@
 # Ignore everything in this directory
 *
-# Except this file
+# Except these files
 !.gitignore
+# !weights_chd_ct_table2-320-O128-d4-p1.json
+# !weights_chd_ct_table2-320-O128-d4-p1.pth
+!weights_chd_ct_table1-O128-d3-p1.json
+!weights_chd_ct_table1-O128-d3-p1.pth
